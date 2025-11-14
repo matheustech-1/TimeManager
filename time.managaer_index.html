@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TimeManager — Atividades, Tarefas e Finanças</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="tm-app">
+    <header class="tm-header">
+      <div class="tm-brand">⏱️ TimeManager</div>
+      <nav class="tm-nav">
+        <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="nav-btn" data-tab="tasks">Tarefas</button>
+        <button class="nav-btn" data-tab="timer">Cronômetro</button>
+        <button class="nav-btn" data-tab="finance">Finanças</button>
+        <button class="nav-btn" data-tab="reports">Relatórios</button>
+      </nav>
+    </header>
+
+    <main class="tm-main">
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="tab active">
+        <h2>Visão Geral</h2>
+        <div class="grid-3">
+          <div class="card small">
+            <h3>Tempo hoje</h3>
+            <p id="today-time">0h 0m</p>
+          </div>
+          <div class="card small">
+            <h3>Tarefas ativas</h3>
+            <p id="active-tasks">0</p>
+          </div>
+          <div class="card small">
+            <h3>Saldo</h3>
+            <p id="balance">R$ 0,00</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Tarefas Recentes</h3>
+          <ul id="recent-tasks" class="list"></ul>
+        </div>
+      </section>
+
+      <!-- TASKS -->
+      <section id="tasks" class="tab">
+        <h2>Gerenciador de Tarefas</h2>
+        <form id="task-form" class="form-inline">
+          <input id="task-title" placeholder="Nova tarefa (ex: Estudar JS)" required>
+          <select id="task-priority">
+            <option value="low">Baixa</option>
+            <option value="medium" selected>Média</option>
+            <option value="high">Alta</option>
+          </select>
+          <button type="submit" class="btn">Adicionar</button>
+        </form>
+
+        <ul id="task-list" class="list"></ul>
+      </section>
+
+      <!-- TIMER -->
+      <section id="timer" class="tab">
+        <h2>Cronômetro / Registrar Atividade</h2>
+        <div class="card timer-card">
+          <div class="timer-display" id="timer-display">00:00:00</div>
+          <div class="timer-controls">
+            <select id="timer-task-select"></select>
+            <button id="timer-start" class="btn btn-primary">Iniciar</button>
+            <button id="timer-pause" class="btn" disabled>Pausar</button>
+            <button id="timer-stop" class="btn" disabled>Parar e Registrar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Registros de Tempo</h3>
+          <ul id="time-log" class="list"></ul>
+        </div>
+      </section>
+
+      <!-- FINANCE -->
+      <section id="finance" class="tab">
+        <h2>Gerenciamento Financeiro</h2>
+        
+        <div class="card">
+          <h3>Saldo Inicial</h3>
+          <div class="form-inline">
+            <input id="initial-balance" type="number" step="0.01" placeholder="Digite o saldo inicial" value="0">
+            <button id="set-balance-btn" class="btn btn-primary">Definir Saldo</button>
+          </div>
+        </div>
+
+        <form id="txn-form" class="form-inline">
+          <input id="txn-desc" placeholder="Descrição" required>
+          <input id="txn-amount" type="number" step="0.01" placeholder="Valor (use negativo para despesa)" required>
+          <select id="txn-cat">
+            <option value="income">Receita</option>
+            <option value="food">Alimentação</option>
+            <option value="transport">Transporte</option>
+            <option value="bills">Contas</option>
+            <option value="entertain">Lazer</option>
+            <option value="other" selected>Outros</option>
+          </select>
+          <button type="submit" class="btn">Adicionar</button>
+        </form>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Transações</h3>
+            <ul id="txn-list" class="list"></ul>
+          </div>
+          <div class="card">
+            <h3>Resumo</h3>
+            <p>Saldo: <strong id="finance-balance">R$ 0,00</strong></p>
+            <p>Receitas: <span id="finance-income">R$ 0,00</span></p>
+            <p>Despesas: <span id="finance-expense">R$ 0,00</span></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="reports" class="tab">
+        <h2>Relatórios e Gráficos</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Despesas por Categoria</h3>
+            <canvas id="pie-chart"></canvas>
+          </div>
+          <div class="card">
+            <h3>Receita x Despesa (últimos 6 meses)</h3>
+            <canvas id="bar-chart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="tm-footer">
+      <small>TimeManager • dados locais no navegador</small>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
