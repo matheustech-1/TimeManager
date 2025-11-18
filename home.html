@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TimeManager — Atividades, Tarefas e Finanças</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Verificação de autenticação -->
+  <script>
+    // Se não estiver logado, redireciona para login
+    if (localStorage.getItem('loggedIn') !== 'true') {
+      window.location.href = 'index.html';
+    }
+  </script>
+</head>
+<body>
+  <div class="tm-app" id="app">
+    <header class="tm-header" role="banner">
+      <div class="tm-brand" aria-hidden="true">⏱️ TimeManager</div>
+
+      <nav class="tm-nav" role="navigation" aria-label="Principal">
+        <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="nav-btn" data-tab="tasks">Tarefas</button>
+        <button class="nav-btn" data-tab="timer">Cronômetro</button>
+        <button class="nav-btn" data-tab="finance">Finanças</button>
+        <button class="nav-btn" data-tab="reports">Relatórios</button>
+        <button class="nav-btn" id="logoutBtn" onclick="logout()" style="margin-left:auto; background:rgba(255, 51, 102, 0.2); border-color:rgba(255, 51, 102, 0.5); color:#ff3366;">Sair</button>
+      </nav>
+    </header>
+
+    <main class="tm-main">
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="tab active" aria-labelledby="dashboard-title">
+        <h1 id="dashboard-title">Visão Geral</h1>
+
+        <div class="grid-3 stats">
+          <div class="card small">
+            <h3>Tempo hoje</h3>
+            <p id="today-time">0h 0m</p>
+          </div>
+          <div class="card small">
+            <h3>Tarefas ativas</h3>
+            <p id="active-tasks">0</p>
+          </div>
+          <div class="card small">
+            <h3>Saldo</h3>
+            <p id="balance">R$ 0,00</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Últimas tarefas</h3>
+          <ul id="recent-tasks" class="list"></ul>
+        </div>
+      </section>
+
+      <!-- TASKS -->
+      <section id="tasks" class="tab" aria-labelledby="tasks-title" hidden>
+        <h2 id="tasks-title">Gerenciador de Tarefas</h2>
+
+        <form id="task-form" class="form-inline" aria-label="Adicionar tarefa">
+          <input id="task-title" placeholder="Nova tarefa (ex: Estudar JS)" aria-label="Título da tarefa" required>
+          <select id="task-priority" aria-label="Prioridade da tarefa">
+            <option value="Baixa">Baixa</option>
+            <option value="Média" selected>Média</option>
+            <option value="Alta">Alta</option>
+          </select>
+          <button type="submit" class="btn btn-primary">Adicionar</button>
+        </form>
+
+        <div class="card">
+          <h3>Lista de tarefas</h3>
+          <ul id="task-list" class="list"></ul>
+        </div>
+      </section>
+
+      <!-- TIMER -->
+      <section id="timer" class="tab" aria-labelledby="timer-title" hidden>
+        <h2 id="timer-title">Cronômetro / Registrar Atividade</h2>
+
+        <div class="card timer-card">
+          <div class="timer-display" id="timer-display" aria-live="polite">00:00:00</div>
+
+          <div class="timer-controls">
+            <select id="timer-task-select" aria-label="Tarefa selecionada"></select>
+            <button id="timer-start" class="btn btn-primary">Iniciar</button>
+            <button id="timer-pause" class="btn" disabled>Pausar</button>
+            <button id="timer-stop" class="btn" disabled>Parar e Registrar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Registros de Tempo</h3>
+          <ul id="time-log" class="list"></ul>
+        </div>
+      </section>
+
+      <!-- FINANCE -->
+      <section id="finance" class="tab" aria-labelledby="finance-title" hidden>
+        <h2 id="finance-title">Gerenciamento Financeiro</h2>
+
+        <div class="card">
+          <h3>Saldo Inicial</h3>
+          <div class="form-inline">
+            <input id="initial-balance" type="number" step="0.01" placeholder="Digite o saldo inicial" value="0" aria-label="Saldo inicial">
+            <button id="set-balance-btn" class="btn btn-primary">Definir Saldo</button>
+          </div>
+        </div>
+
+        <form id="txn-form" class="form-inline" aria-label="Adicionar transação">
+          <input id="txn-desc" placeholder="Descrição" aria-label="Descrição da transação" required>
+          <input id="txn-amount" type="number" step="0.01" placeholder="Valor (use negativo para despesa)" aria-label="Valor da transação" required>
+          <select id="txn-cat" aria-label="Categoria">
+            <option value="income">Receita</option>
+            <option value="food">Alimentação</option>
+            <option value="transport">Transporte</option>
+            <option value="bills">Contas</option>
+            <option value="entertain">Lazer</option>
+            <option value="other" selected>Outros</option>
+          </select>
+          <button type="submit" class="btn">Adicionar</button>
+        </form>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Transações</h3>
+            <ul id="txn-list" class="list"></ul>
+          </div>
+          <div class="card">
+            <h3>Resumo</h3>
+            <p>Saldo: <strong id="finance-balance">R$ 0,00</strong></p>
+            <p>Receitas: <span id="finance-income">R$ 0,00</span></p>
+            <p>Despesas: <span id="finance-expense">R$ 0,00</span></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="reports" class="tab" aria-labelledby="reports-title" hidden>
+        <h2 id="reports-title">Relatórios e Gráficos</h2>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Despesas por Categoria (editável)</h3>
+            <canvas id="pie-chart" aria-label="Gráfico de pizza de despesas" role="img"></canvas>
+
+            <form id="cat-form" class="form-inline small-form" aria-label="Gerenciar categorias">
+              <input id="cat-name" placeholder="Nome da categoria" required aria-label="Nome da categoria">
+              <input id="cat-value" type="number" step="0.01" placeholder="Valor" required aria-label="Valor da categoria">
+              <button type="submit" class="btn btn-primary">Adicionar/Atualizar</button>
+              <button type="button" id="cat-clear" class="btn">Limpar</button>
+            </form>
+
+            <div id="cat-list" class="list small-list" aria-live="polite"></div>
+          </div>
+
+          <div class="card">
+            <h3>Receita x Despesa (últimos 6 meses)</h3>
+            <canvas id="bar-chart" aria-label="Gráfico de barras de receita e despesa" role="img"></canvas>
+            <p class="muted">Os últimos 6 meses são gerados a partir das transações.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="tm-footer" role="contentinfo">
+      <small>TimeManager • dados armazenados localmente no seu navegador</small>
+    </footer>
+  </div>
+
+  <!-- Script -->
+  <script src="script.js" defer></script>
+
+  $ firebase deployment script
+
+  <script>
+    // Intercepta o botão voltar do navegador (mobile)
+    // Força logout ao pressionar voltar no navegador, mesmo se voltar para dashboard
+   window.addEventListener('popstate', function(event) {
+    checkLogoutOnBack();
+});
+
+// Monitora quando a página volta do histórico (ex: multitarefa)
+window.addEventListener('pageshow', function(event) {
+    checkLogoutOnBack();
+});
+
+// Opcional: monitore mudanças no hash também
+window.addEventListener('hashchange', function(event) {
+    checkLogoutOnBack();
+      }
+    );
+
+    // Detecta se a página ficou visível novamente
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        forceLogout();
+      }
+
+      // Função de logout
+function logout() {
+    // Limpe os dados de autenticação/sessão conforme sua lógica
+    localStorage.removeItem('token'); // ou sessionStorage, se for o caso
+
+    // Redirecione para a tela de login (index.html)
+    window.location.replace('index.html');
+}
+
+// Função para verificar se deve deslogar
+function checkLogoutOnBack() {
+// Supondo que você use hash ou query para abas internas
+// Exemplo: home.html#dashboard, home.html#tarefas
+const isHome = window.location.pathname.endsWith('home.html');
+const hasInternalTab = window.location.hash.length > 0;
+
+if (isHome && !hasInternalTab) {
+logoutAndRedirect();
+}
+}
+
+// Monitora o botão voltar
+window.addEventListener('popstate', function(event) {
+checkLogoutOnBack();
+});
+
+// Monitora quando a página volta do histórico (ex: multitarefa)
+window.addEventListener('pageshow', function(event) {
+checkLogoutOnBack();
+});
+
+
+    });
+  </script>
+</body>
+</html>

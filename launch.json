@@ -1,6 +1,6 @@
 {
   "name": "time_manager_server",
-  "url": " https://matheustech-1.github.io/TimeManager/",
+  "url": "https://192.168.11.198:3000/",
   "version": "1.0.0",
   "description": "Servidor do TimeManager acessível via rede local",
   "main": "server.js",

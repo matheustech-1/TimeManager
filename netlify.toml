@@ -1,0 +1,36 @@
+[build]
+  # Não há build necessário — arquivos estáticos
+  publish = "."
+  command = "echo 'No build required for static site'"
+
+[context.production]
+  environment = { NODE_ENV = "production" }
+
+[[redirects]]
+  # Redireciona tudo para index.html para SPA (caso necessário)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  condition = { Query = { path = "!*.{js,css,svg,png,jpg,jpeg,gif,ico,woff,woff2}" } }
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Segurança e performance
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    # Cache
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
