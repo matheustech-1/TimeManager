@@ -166,4 +166,23 @@ body {
  .form-inline input,.form-inline select,.btn{width:100%;}
  .timer-display{font-size:32px;}
  .card{padding:16px;}
+
+ .timer-controls {
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center;     /* Centraliza verticalmente se a altura permitir */
+  gap: 12px;               /* Espaço entre os botões */
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Responsivo para telas pequenas */
+@media (max-width: 600px) {
+  .timer-controls {
+    flex-direction: column; /* Empilha os botões no mobile */
+    gap: 10px;
+    width: 100%;
+    padding: 0 8px;
+  }
+}
 }
